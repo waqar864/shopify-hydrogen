@@ -5,6 +5,7 @@ import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import { CartLineItem } from '~/components/cart/CartLineItem';
 import { CartSummary } from './CartSummary';
 import CartEmpty from './CartEmpty';
+import { CartLine } from '@shopify/hydrogen/storefront-api-types';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -37,7 +38,7 @@ export function CartMain({ layout, cart: originalCart }: CartMainProps) {
         <div aria-labelledby="cart-lines">
           <ul>
             {(cart?.lines?.nodes ?? []).map((line) => (
-              <CartLineItem key={line.id} line={line} layout={layout} />
+              <CartLineItem key={line.id} line={line as CartLine} layout={layout} />
             ))}
           </ul>
         </div>

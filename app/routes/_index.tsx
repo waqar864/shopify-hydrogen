@@ -6,6 +6,7 @@ import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
+import { ArrowRight } from 'lucide-react';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Hydrogen | Home'}];
@@ -59,8 +60,45 @@ export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      {/* <FeaturedCollection collection={data.featuredCollection} />
+      <RecommendedProducts products={data.recommendedProducts} /> */}
+      {/* hero section */}
+      <section className='relative h-screen min-h-[600px] bg-brand-navy'>
+        <Image
+          alt="Hero Image"
+          className='absolute inset-0 object-cover w-full h-full opacity-70'
+          sizes='(max-width: 768px) 100vw,(max-width: 1200px) 50vw,33vw'
+          loading='eager'
+          data={{
+            url:"/image/craftsmen.png",
+            width:1920,
+            height:1080
+          }}
+
+          />
+          <div className='relative container mx-auto px-4 h-full flex items-center'>
+            <div className='max-w-2xl'>
+              <h1>Artisinal Footwear for the modren Sophicticate</h1>
+              <p>Handcrafted excellence, design for distinction</p>
+              <Link
+                to="/collections/all"
+                className='inline-flex items-center px-8 py-4 bg:brand-gold hover:bg-brand-goldDark transition-colors duration-200 text-white font-source text-sm mt-8'
+              >
+                Explore Collections
+                <ArrowRight className='ml-2 w-5 h-5' />
+              </Link>
+            
+              </div>
+          </div>
+
+      </section>
+
+      {/* recomended products */}
+
+      {/* craftsmanship section */}
+
+
+      {/* testimonial section */}
     </div>
   );
 }

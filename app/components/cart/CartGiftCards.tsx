@@ -4,51 +4,28 @@ import { Loader2, Ticket } from "lucide-react";
 import { useRef, useState } from "react";
 import { CartApiQueryFragment } from "storefrontapi.generated";
 
-
-function CartDiscounts({
-  discountCodes,
-}: {
-  discountCodes?: CartApiQueryFragment['discountCodes'];
-}) {
-  // const codes: string[] =
-  //   discountCodes
-  //     ?.filter((discount) => discount.applicable)
-  //     ?.map(({ code }) => code) || [];
-
-  // return (
-  //   <div>
-  //     {/* Have existing discount, display it with a remove option */}
-  //     <dl hidden={!codes.length}>
-  //       <div>
-  //         <dt>Discount(s)</dt>
-  //         <UpdateDiscountForm>
-  //           <div className="cart-discount">
-  //             <code>{codes?.join(', ')}</code>
-  //             &nbsp;
-  //             <button>Remove</button>
-  //           </div>
-  //         </UpdateDiscountForm>
-  //       </div>
-  //     </dl>
-
-  //     {/* Show an input to apply a discount */}
-  //     <UpdateDiscountForm discountCodes={codes}>
-  //       <div>
-  //         <input type="text" name="discountCode" placeholder="Discount code" />
-  //         &nbsp;
-  //         <button type="submit">Apply</button>
-  //       </div>
-  //     </UpdateDiscountForm>
-  //   </div>
-  // );
-
-  const [showInput,setShowInput] = useState<boolean>(false);
+const CartGiftCard = ({
+    giftCardCodes,
+  }: {
+    giftCardCodes?: CartApiQueryFragment['appliedGiftCards'] | undefined;
+  }) => {
+    const [showInput,setShowInput] = useState<boolean>(false);
+    const appliedGiftCardCodes = useRef<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const codes: string[] =
-    discountCodes
-      ?.filter((discount) => discount.applicable)
-      ?.map(({ code }) => code) || [];
+  giftCardCodes?.map(({ lastCharacters }) => `... ${lastCharacters}`) || [];
+  const saveAppliedCode = (code: string) => {
+      if(!inputRef.current){
+        return;
+      }
+      const formattedCode = code.replace(/\s/g, '');
+      if(!appliedGiftCardCodes.current.includes(formattedCode)){
+        appliedGiftCardCodes.current.push(formattedCode);
+      }
+      inputRef.current.value = '';
+      setShowInput(false);
+  }
 
   return (
     <div className="py-4 border-t border-gray-100">
@@ -59,7 +36,9 @@ function CartDiscounts({
 
       {/* discount input */}
       {showInput ? (
-        <UpdateDiscountForm discountCodes={codes}>
+        <UpdateGiftCardForm giftCardCodes={appliedGiftCardCodes.current}
+        saveAppliedCode={saveAppliedCode}
+        >
           {(fetcher) => {
             //handle state
             const isLoading = fetcher.state !== 'idle';
@@ -69,8 +48,8 @@ function CartDiscounts({
                 <input
                   ref={inputRef}
                   type="text"
-                  name="discountCode"
-                  placeholder="Enter Promo Code"
+                  name="GiftCardCode"
+                  placeholder="Giftcard Code"
                   className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-brand-navy font-source text-sm"
                 />
                 {isLoading && (
@@ -99,14 +78,14 @@ function CartDiscounts({
             )         }}
          
 
-            </UpdateDiscountForm>
+            </UpdateGiftCardForm>
       ):(
         <button
         onClick={() => setShowInput(true)}
         className="text-sm text-brand-gold hover:text-brand-gold font-source transition-colors inline-flex items-center gap-2"
         >
           <Ticket className="w-6 h-6" />
-          Add Promo Code
+          Add Gift Card
         </button>
       )
            }
@@ -114,28 +93,37 @@ function CartDiscounts({
     </div>
 
   )
-}
+  }
+  
+  function UpdateGiftCardForm({
+    giftCardCodes,
+    saveAppliedCode,
+    children,
+  }: {
+    giftCardCodes?: string[];
+    saveAppliedCode?: (code: string) => void;
+    removeAppliedCode?: () => void;
+    children: React.ReactNode | ((fetcher: any) => React.ReactNode);
+  }) {
+    return (
+      <CartForm
+        route="/cart"
+        action={CartForm.ACTIONS.GiftCardCodesUpdate}
+        inputs={{
+          giftCardCodes: giftCardCodes || [],
+        }}
+      >
+        {(fetcher) => {
+            const code = fetcher.formData?.get("giftCardCode");
+            if(code && saveAppliedCode){
+                saveAppliedCode(code as string);
+            }
+            return typeof children === 'function' ? children(fetcher): children;
+        } 
+        
+    }
+      </CartForm>
+    );
+  }
 
-
-
-function UpdateDiscountForm({
-  discountCodes,
-  children,
-}: {
-  discountCodes?: string[];
-  children: React.ReactNode | ((fetcher: FetcherWithComponents<any>) => React.ReactNode);
-}) {
-  return (
-    <CartForm
-      route="/cart"
-      action={CartForm.ACTIONS.DiscountCodesUpdate}
-      inputs={{
-        discountCodes: discountCodes || [],
-      }}
-    >
-      {children}
-    </CartForm>
-  );
-}
-
-export default CartDiscounts;
+  export default CartGiftCard

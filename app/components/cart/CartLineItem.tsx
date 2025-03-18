@@ -5,7 +5,7 @@ import { useVariantUrl } from '~/lib/variants';
 import { Link } from '@remix-run/react';
 import { ProductPrice } from '../ProductPrice';
 import { useAside } from '../Aside';
-import type { CartApiQueryFragment } from 'storefrontapi.generated';
+// import type { CartApiQueryFragment } from 'storefrontapi.generated';
 import CartLineQuantityAdjuster from './CartLineQuantityAdjuster';
 
 
